@@ -6,6 +6,12 @@ __pycache__/
 # C extensions
 *.so
 
+# Images
+*.jpg
+
+# Pycharm stuff
+.idea
+
 # Distribution / packaging
 .Python
 env/
