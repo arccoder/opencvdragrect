@@ -2,6 +2,8 @@
 
 To drag a rectangle on an image window. Select the entire rectangle and move it around. Hold on to corner or a side and resize the rectangle.
 
+![Preview gif](https://cdn.rawgit.com/arccoder/opencvdragrect/master/preview.gif "Preview Image")
+
 ## Usage
 
 Import script
