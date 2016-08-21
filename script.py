@@ -12,9 +12,9 @@ import selectinwindow
 rectI = selectinwindow.dragRect
 
 # Initialize the  drag object
-imageWidth = 256
-imageHeight = 256
-image = np.ones([256, 256, 3], dtype=np.uint8)
+imageWidth = 320
+imageHeight = 240
+image = np.ones([imageHeight, imageWidth, 3], dtype=np.uint8)
 image *= 255
 selectinwindow.init(rectI, image, imageWidth, imageHeight)
 
