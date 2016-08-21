@@ -1,6 +1,6 @@
 # opencvdragrect
 
-To drag a rectangle on an image window. Select the entire rectangle and move it around. Hold on to corner or a side and resie the rectangle.
+To drag a rectangle on an image window. Select the entire rectangle and move it around. Hold on to corner or a side and resize the rectangle.
 
 ## Usage
 
@@ -11,7 +11,7 @@ rectI = selectinwindow.dragRect
 ```
 Initialize the  drag object
 ```python
-selectinwindow.init(rectI)
+selectinwindow.init(rectI, image, imageWidth, imageHeight)
 ```
 Set mouse click callback function
 ```python
