@@ -1,5 +1,4 @@
 import cv2
-import numpy as np
 
 
 class Rect:
@@ -20,12 +19,17 @@ class dragRect:
     # To store rectangle
     outRect = Rect()
     # To store rectangle anchor point
-    # Used only while dragging the whole rectangle
+    # Here the rect class object is used to store
+    # the distance in the x and y direction from
+    # the anchor point to the top-left and the bottom-right corner
     anchor = Rect()
     # Selection marker size
     sBlk = 4
     # Whether initialized or not
     initialized = False
+
+    # Image
+    image = None
 
     # FLAGS
     # Rect already present
@@ -45,6 +49,25 @@ class dragRect:
 
 
 # endclass
+
+def init(dragObj, Img, windowWidth, windowHeight):
+    # Image
+    dragObj.image = Img
+
+    # Limit the selection box to the canvas
+    dragObj.keepWithin.x = 0
+    dragObj.keepWithin.y = 0
+    dragObj.keepWithin.w = windowWidth
+    dragObj.keepWithin.h = windowHeight
+
+    # Set rect to zero width and height
+    dragObj.outRect.x = 0
+    dragObj.outRect.y = 0
+    dragObj.outRect.w = 0
+    dragObj.outRect.h = 0
+
+
+# enddef
 
 def dragrect(event, x, y, flags, dragObj):
     if x < dragObj.keepWithin.x:
@@ -70,28 +93,15 @@ def dragrect(event, x, y, flags, dragObj):
         mouseMove(x, y, dragObj)
     # endif
 
+
 # enddef
-
-def init(dragObj):
-    # Limit the selection box to the canvas
-    dragObj.keepWithin.x = 0
-    dragObj.keepWithin.y = 0
-    dragObj.keepWithin.w = 256
-    dragObj.keepWithin.h = 256
-
-    # Set rect to zero width and height
-    dragObj.outRect.x = 0
-    dragObj.outRect.y = 0
-    dragObj.outRect.w = 0
-    dragObj.outRect.h = 0
-
 
 def pointInRect(pX, pY, rX, rY, rW, rH):
     if rX <= pX <= (rX + rW) and rY <= pY <= (rY + rH):
         return True
     else:
         return False
-        # endifelse
+    # endelseif
 
 
 # enddef
@@ -151,13 +161,14 @@ def mouseDown(eX, eY, dragObj):
 
         # This has to be below all of the other conditions
         if pointInRect(eX, eY, dragObj.outRect.x, dragObj.outRect.y, dragObj.outRect.w, dragObj.outRect.h):
-            dragObj.anchor.xLeft = eX - dragObj.outRect.x
-            dragObj.anchor.xRight = dragObj.outRect.w - dragObj.anchor.xLeft
-            dragObj.anchor.xTop = eY - dragObj.outRect.y
-            dragObj.anchor.xBottom = dragObj.outRect.h - dragObj.anchor.xTop
+            dragObj.anchor.x = eX - dragObj.outRect.x
+            dragObj.anchor.w = dragObj.outRect.w - dragObj.anchor.x
+            dragObj.anchor.y = eY - dragObj.outRect.y
+            dragObj.anchor.h = dragObj.outRect.h - dragObj.anchor.y
             dragObj.hold = True
+
             return
-            # endif
+        # endif
 
     else:
         dragObj.outRect.x = eX
@@ -165,10 +176,11 @@ def mouseDown(eX, eY, dragObj):
         dragObj.drag = True
         dragObj.active = True
         return
-        # endif
+
+    # endelseif
 
 
-# endif
+# enddef
 
 def mouseMove(eX, eY, dragObj):
     if dragObj.drag & dragObj.active:
@@ -179,9 +191,22 @@ def mouseMove(eX, eY, dragObj):
     # endif
 
     if dragObj.hold:
-        dragObj.outRect.x = eX - dragObj.anchor.xLeft
-        dragObj.outRect.y = eY - dragObj.anchor.xTop
-        straightenUpRect(dragObj)
+        dragObj.outRect.x = eX - dragObj.anchor.x
+        dragObj.outRect.y = eY - dragObj.anchor.y
+
+        if dragObj.outRect.x < dragObj.keepWithin.x:
+            dragObj.outRect.x = dragObj.keepWithin.x
+        # endif
+        if dragObj.outRect.y < dragObj.keepWithin.y:
+            dragObj.outRect.y = dragObj.keepWithin.y
+        # endif
+        if (dragObj.outRect.x + dragObj.outRect.w) > (dragObj.keepWithin.x + dragObj.keepWithin.w - 1):
+            dragObj.outRect.x = dragObj.keepWithin.x + dragObj.keepWithin.w - 1 - dragObj.outRect.w
+        # endif
+        if (dragObj.outRect.y + dragObj.outRect.h) > (dragObj.keepWithin.y + dragObj.keepWithin.h - 1):
+            dragObj.outRect.y = dragObj.keepWithin.y + dragObj.keepWithin.h - 1 - dragObj.outRect.h
+        # endif
+
         clearCanvasNDraw(dragObj)
         return
     # endif
@@ -236,7 +261,7 @@ def mouseMove(eX, eY, dragObj):
         dragObj.outRect.w = eX - dragObj.outRect.x
         clearCanvasNDraw(dragObj)
         return
-        # endif
+    # endif
 
 
 # enddef
@@ -271,73 +296,73 @@ def straightenUpRect(dragObj):
     if dragObj.outRect.h < 0:
         dragObj.outRect.y = dragObj.outRect.y + dragObj.outRect.h
         dragObj.outRect.h = -dragObj.outRect.h
-        # endif
+    # endif
 
 
 # enddef
 
 def clearCanvasNDraw(dragObj):
     # Draw
-    I = np.ones([256, 256, 3], dtype=np.uint8)
-    I = I * 255
-    cv2.rectangle(I, (dragObj.outRect.x, dragObj.outRect.y),
+    tmp = dragObj.image.copy()
+    cv2.rectangle(tmp, (dragObj.outRect.x, dragObj.outRect.y),
                   (dragObj.outRect.x + dragObj.outRect.w,
                    dragObj.outRect.y + dragObj.outRect.h), (0, 255, 0), 2)
-    drawSelectMarkers(I, dragObj)
-    cv2.imshow("image", I)
+    drawSelectMarkers(tmp, dragObj)
+    cv2.imshow("image", tmp)
     cv2.waitKey()
 
 
 # enddef
 
-def drawSelectMarkers(I, dragObj):
+def drawSelectMarkers(image, dragObj):
     # Top-Left
-    cv2.rectangle(I, (dragObj.outRect.x - dragObj.sBlk,
-                      dragObj.outRect.y - dragObj.sBlk),
+    cv2.rectangle(image, (dragObj.outRect.x - dragObj.sBlk,
+                          dragObj.outRect.y - dragObj.sBlk),
                   (dragObj.outRect.x - dragObj.sBlk + dragObj.sBlk * 2,
                    dragObj.outRect.y - dragObj.sBlk + dragObj.sBlk * 2),
                   (0, 255, 0), 2)
     # Top-Rigth
-    cv2.rectangle(I, (dragObj.outRect.x + dragObj.outRect.w - dragObj.sBlk,
-                      dragObj.outRect.y - dragObj.sBlk),
+    cv2.rectangle(image, (dragObj.outRect.x + dragObj.outRect.w - dragObj.sBlk,
+                          dragObj.outRect.y - dragObj.sBlk),
                   (dragObj.outRect.x + dragObj.outRect.w - dragObj.sBlk + dragObj.sBlk * 2,
                    dragObj.outRect.y - dragObj.sBlk + dragObj.sBlk * 2),
                   (0, 255, 0), 2)
     # Bottom-Left
-    cv2.rectangle(I, (dragObj.outRect.x - dragObj.sBlk,
-                      dragObj.outRect.y + dragObj.outRect.h - dragObj.sBlk),
+    cv2.rectangle(image, (dragObj.outRect.x - dragObj.sBlk,
+                          dragObj.outRect.y + dragObj.outRect.h - dragObj.sBlk),
                   (dragObj.outRect.x - dragObj.sBlk + dragObj.sBlk * 2,
                    dragObj.outRect.y + dragObj.outRect.h - dragObj.sBlk + dragObj.sBlk * 2),
                   (0, 255, 0), 2)
     # Bottom-Right
-    cv2.rectangle(I, (dragObj.outRect.x + dragObj.outRect.w - dragObj.sBlk,
-                      dragObj.outRect.y + dragObj.outRect.h - dragObj.sBlk),
+    cv2.rectangle(image, (dragObj.outRect.x + dragObj.outRect.w - dragObj.sBlk,
+                          dragObj.outRect.y + dragObj.outRect.h - dragObj.sBlk),
                   (dragObj.outRect.x + dragObj.outRect.w - dragObj.sBlk + dragObj.sBlk * 2,
                    dragObj.outRect.y + dragObj.outRect.h - dragObj.sBlk + dragObj.sBlk * 2),
                   (0, 255, 0), 2)
 
     # Top-Mid
-    cv2.rectangle(I, (dragObj.outRect.x + dragObj.outRect.w / 2 - dragObj.sBlk,
-                      dragObj.outRect.y - dragObj.sBlk),
+    cv2.rectangle(image, (dragObj.outRect.x + dragObj.outRect.w / 2 - dragObj.sBlk,
+                          dragObj.outRect.y - dragObj.sBlk),
                   (dragObj.outRect.x + dragObj.outRect.w / 2 - dragObj.sBlk + dragObj.sBlk * 2,
                    dragObj.outRect.y - dragObj.sBlk + dragObj.sBlk * 2),
                   (0, 255, 0), 2)
     # Bottom-Mid
-    cv2.rectangle(I, (dragObj.outRect.x + dragObj.outRect.w / 2 - dragObj.sBlk,
-                      dragObj.outRect.y + dragObj.outRect.h - dragObj.sBlk),
+    cv2.rectangle(image, (dragObj.outRect.x + dragObj.outRect.w / 2 - dragObj.sBlk,
+                          dragObj.outRect.y + dragObj.outRect.h - dragObj.sBlk),
                   (dragObj.outRect.x + dragObj.outRect.w / 2 - dragObj.sBlk + dragObj.sBlk * 2,
                    dragObj.outRect.y + dragObj.outRect.h - dragObj.sBlk + dragObj.sBlk * 2),
                   (0, 255, 0), 2)
     # Left-Mid
-    cv2.rectangle(I, (dragObj.outRect.x - dragObj.sBlk,
-                      dragObj.outRect.y + dragObj.outRect.h / 2 - dragObj.sBlk),
+    cv2.rectangle(image, (dragObj.outRect.x - dragObj.sBlk,
+                          dragObj.outRect.y + dragObj.outRect.h / 2 - dragObj.sBlk),
                   (dragObj.outRect.x - dragObj.sBlk + dragObj.sBlk * 2,
                    dragObj.outRect.y + dragObj.outRect.h / 2 - dragObj.sBlk + dragObj.sBlk * 2),
                   (0, 255, 0), 2)
     # Right-Mid
-    cv2.rectangle(I, (dragObj.outRect.x + dragObj.outRect.w - dragObj.sBlk,
-                      dragObj.outRect.y + dragObj.outRect.h / 2 - dragObj.sBlk),
+    cv2.rectangle(image, (dragObj.outRect.x + dragObj.outRect.w - dragObj.sBlk,
+                          dragObj.outRect.y + dragObj.outRect.h / 2 - dragObj.sBlk),
                   (dragObj.outRect.x + dragObj.outRect.w - dragObj.sBlk + dragObj.sBlk * 2,
                    dragObj.outRect.y + dragObj.outRect.h / 2 - dragObj.sBlk + dragObj.sBlk * 2),
                   (0, 255, 0), 2)
-    # enddef
+
+# enddef
