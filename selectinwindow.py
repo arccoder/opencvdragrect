@@ -1,7 +1,7 @@
 # MIT License
 
 # Copyright (c) 2016 Akshay Chavan
- 
+
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
 # in the Software without restriction, including without limitation the rights
@@ -53,6 +53,12 @@ class dragRect:
     # Image
     image = None
 
+    # Window Name
+    wname = ""
+
+    # Return flag
+    returnflag = False
+
     # FLAGS
     # Rect already present
     active = False
@@ -72,9 +78,12 @@ class dragRect:
 
 # endclass
 
-def init(dragObj, Img, windowWidth, windowHeight):
+def init(dragObj, Img, windowName, windowWidth, windowHeight):
     # Image
     dragObj.image = Img
+
+    # Window name
+    dragObj.wname = windowName
 
     # Limit the selection box to the canvas
     dragObj.keepWithin.x = 0
@@ -114,7 +123,9 @@ def dragrect(event, x, y, flags, dragObj):
     if event == cv2.EVENT_MOUSEMOVE:
         mouseMove(x, y, dragObj)
     # endif
-
+    if event == cv2.EVENT_LBUTTONDBLCLK:
+        mouseDoubleClick(x, y, dragObj)
+    # endif
 
 # enddef
 
@@ -124,6 +135,19 @@ def pointInRect(pX, pY, rX, rY, rW, rH):
     else:
         return False
     # endelseif
+
+
+# enddef
+
+def mouseDoubleClick(eX, eY, dragObj):
+    if dragObj.active:
+
+        if pointInRect(eX, eY, dragObj.outRect.x, dragObj.outRect.y, dragObj.outRect.w, dragObj.outRect.h):
+            dragObj.returnflag = True
+            cv2.destroyWindow(dragObj.wname)
+        # endif
+
+    # endif
 
 
 # enddef
@@ -330,7 +354,7 @@ def clearCanvasNDraw(dragObj):
                   (dragObj.outRect.x + dragObj.outRect.w,
                    dragObj.outRect.y + dragObj.outRect.h), (0, 255, 0), 2)
     drawSelectMarkers(tmp, dragObj)
-    cv2.imshow("image", tmp)
+    cv2.imshow(dragObj.wname, tmp)
     cv2.waitKey()
 
 

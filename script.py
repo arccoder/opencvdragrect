@@ -1,8 +1,7 @@
-import cv2
+import cv2 # Opencv ver 3.1.0 used
 import numpy as np
 
 import sys
-
 # Set recursion limit
 sys.setrecursionlimit(10 ** 9)
 
@@ -12,25 +11,27 @@ import selectinwindow
 rectI = selectinwindow.dragRect
 
 # Initialize the  drag object
+wName = "select region"
 imageWidth = 320
 imageHeight = 240
-image = np.ones([imageHeight, imageWidth, 3], dtype=np.uint8)
+image = np.ones([imageHeight, imageWidth, 3], dtype=np.uint8) # OR read an image using imread()
 image *= 255
-selectinwindow.init(rectI, image, imageWidth, imageHeight)
+selectinwindow.init(rectI, image, wName, imageWidth, imageHeight)
 
-cv2.namedWindow("image")
-cv2.setMouseCallback("image", selectinwindow.dragrect, rectI)
+cv2.namedWindow(rectI.wname)
+cv2.setMouseCallback(rectI.wname, selectinwindow.dragrect, rectI)
 
-# keep looping until the 'q' key is pressed
+# keep looping until rectangle finalized
 while True:
-    # display the image and wait for a keypress
-    cv2.imshow("image", rectI.image)
+    # display the image
+    cv2.imshow(wName, rectI.image)
     key = cv2.waitKey(1) & 0xFF
 
-    # if the 'c' key is pressed, break from the loop
-    if key == ord("c"):
+    # if returnflag is True, break from the loop
+    if rectI.returnflag == True:
         break
 
+print "Dragged rectangle coordinates"
 print str(rectI.outRect.x) + ',' + str(rectI.outRect.y) + ',' + \
       str(rectI.outRect.w) + ',' + str(rectI.outRect.h)
 
