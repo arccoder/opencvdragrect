@@ -1,0 +1,105 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Opencvdragrect by arccoder</title>
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/github-light.css">
+    <meta name="viewport" content="width=device-width">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1>Opencvdragrect</h1>
+        <p>Drag a rectangle on an image window</p>
+
+        <p class="view"><a href="https://github.com/arccoder/opencvdragrect">View the Project on GitHub <small>arccoder/opencvdragrect</small></a></p>
+
+
+        <ul>
+          <li><a href="https://github.com/arccoder/opencvdragrect/zipball/master">Download <strong>ZIP File</strong></a></li>
+          <li><a href="https://github.com/arccoder/opencvdragrect/tarball/master">Download <strong>TAR Ball</strong></a></li>
+          <li><a href="https://github.com/arccoder/opencvdragrect">View On <strong>GitHub</strong></a></li>
+        </ul>
+      </header>
+      <section>
+        <h1>
+<a id="opencvdragrect" class="anchor" href="#opencvdragrect" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>opencvdragrect</h1>
+
+<p>To drag a rectangle on an image window. Select the entire rectangle and move it around. Hold on to corner or a side and resize the rectangle.</p>
+
+<p><img src="https://cdn.rawgit.com/arccoder/opencvdragrect/master/preview.gif" alt="Preview gif" title="Preview Image"></p>
+
+<h2>
+<a id="usage" class="anchor" href="#usage" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Usage</h2>
+
+<p>Import script</p>
+
+<div class="highlight highlight-source-python"><pre><span class="pl-k">import</span> selectinwindow
+windowName <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">'</span>named window<span class="pl-pds">'</span></span>
+rectI <span class="pl-k">=</span> selectinwindow.dragRect</pre></div>
+
+<p>Initialize the  drag object</p>
+
+<div class="highlight highlight-source-python"><pre>selectinwindow.init(rectI, image, windowName, imageWidth, imageHeight)</pre></div>
+
+<p>Set mouse click callback function</p>
+
+<div class="highlight highlight-source-python"><pre>cv2.setMouseCallback(windowName, selectinwindow.dragrect, rectI)</pre></div>
+
+<p><strong>Double click</strong> inside the dragged rectangle to finalize the location of the rect
+The rectangle location can be accessed anytime through outRect</p>
+
+<div class="highlight highlight-source-python"><pre>rectI.outRect</pre></div>
+
+<p>Example of the usage can be found in <code>script.py</code></p>
+
+<h2>
+<a id="note" class="anchor" href="#note" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Note</h2>
+
+<p>You might get the following error</p>
+
+<pre><code>RuntimeError: maximum recursion depth exceeded
+</code></pre>
+
+<p>To avoid this error, you can add the following code.</p>
+
+<div class="highlight highlight-source-python"><pre><span class="pl-k">import</span> sys
+sys.setrecursionlimit(<span class="pl-c1">10</span> <span class="pl-k">**</span> <span class="pl-c1">9</span>)</pre></div>
+
+<p>It would help, while holding the rectangle corner or edge for resizing the rectangle the dragging is done in increments by releasing the held corner or sides intermittently.</p>
+
+<h2>
+<a id="references" class="anchor" href="#references" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>References</h2>
+
+<ol>
+<li>Implementation on how to set callbacks and the infinite loop.
+
+<ul>
+<li> <a href="http://www.pyimagesearch.com/2015/03/09/capturing-mouse-click-events-with-python-and-opencv/">Capturing mouse click events with Python and OpenCV</a>
+</li>
+</ul>
+</li>
+<li>Mouse callback events documentation
+
+<ul>
+<li> <a href="http://docs.opencv.org/3.1.0/d7/dfc/group__highgui.html">OpenCV 3.1.0 High-level GUI</a>
+</li>
+</ul>
+</li>
+</ol>
+      </section>
+      <footer>
+        <p>This project is maintained by <a href="https://github.com/arccoder">arccoder</a></p>
+        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
+      </footer>
+    </div>
+    <script src="javascripts/scale.fix.js"></script>
+    
+  </body>
+</html>
