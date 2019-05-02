@@ -387,28 +387,28 @@ def drawSelectMarkers(image, dragObj):
                   (0, 255, 0), 2)
 
     # Top-Mid
-    cv2.rectangle(image, (dragObj.outRect.x + dragObj.outRect.w / 2 - dragObj.sBlk,
+    cv2.rectangle(image, (dragObj.outRect.x + int(dragObj.outRect.w / 2) - dragObj.sBlk,
                           dragObj.outRect.y - dragObj.sBlk),
-                  (dragObj.outRect.x + dragObj.outRect.w / 2 - dragObj.sBlk + dragObj.sBlk * 2,
+                  (dragObj.outRect.x + int(dragObj.outRect.w / 2) - dragObj.sBlk + dragObj.sBlk * 2,
                    dragObj.outRect.y - dragObj.sBlk + dragObj.sBlk * 2),
                   (0, 255, 0), 2)
     # Bottom-Mid
-    cv2.rectangle(image, (dragObj.outRect.x + dragObj.outRect.w / 2 - dragObj.sBlk,
+    cv2.rectangle(image, (dragObj.outRect.x + int(dragObj.outRect.w / 2) - dragObj.sBlk,
                           dragObj.outRect.y + dragObj.outRect.h - dragObj.sBlk),
-                  (dragObj.outRect.x + dragObj.outRect.w / 2 - dragObj.sBlk + dragObj.sBlk * 2,
+                  (dragObj.outRect.x + int(dragObj.outRect.w / 2) - dragObj.sBlk + dragObj.sBlk * 2,
                    dragObj.outRect.y + dragObj.outRect.h - dragObj.sBlk + dragObj.sBlk * 2),
                   (0, 255, 0), 2)
     # Left-Mid
     cv2.rectangle(image, (dragObj.outRect.x - dragObj.sBlk,
-                          dragObj.outRect.y + dragObj.outRect.h / 2 - dragObj.sBlk),
+                          dragObj.outRect.y + int(dragObj.outRect.h / 2) - dragObj.sBlk),
                   (dragObj.outRect.x - dragObj.sBlk + dragObj.sBlk * 2,
-                   dragObj.outRect.y + dragObj.outRect.h / 2 - dragObj.sBlk + dragObj.sBlk * 2),
+                   dragObj.outRect.y + int(dragObj.outRect.h / 2) - dragObj.sBlk + dragObj.sBlk * 2),
                   (0, 255, 0), 2)
     # Right-Mid
     cv2.rectangle(image, (dragObj.outRect.x + dragObj.outRect.w - dragObj.sBlk,
-                          dragObj.outRect.y + dragObj.outRect.h / 2 - dragObj.sBlk),
+                          dragObj.outRect.y + int(dragObj.outRect.h / 2) - dragObj.sBlk),
                   (dragObj.outRect.x + dragObj.outRect.w - dragObj.sBlk + dragObj.sBlk * 2,
-                   dragObj.outRect.y + dragObj.outRect.h / 2 - dragObj.sBlk + dragObj.sBlk * 2),
+                   dragObj.outRect.y + int(dragObj.outRect.h / 2) - dragObj.sBlk + dragObj.sBlk * 2),
                   (0, 255, 0), 2)
 
 # enddef
