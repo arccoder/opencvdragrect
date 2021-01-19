@@ -1,6 +1,6 @@
 # MIT License
 
-# Copyright (c) 2016 Akshay Chavan
+# Copyright (c) 2021 Akshay Chavan
 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -30,12 +30,10 @@ class Rect:
     h = None
 
     def printit(self):
-        print str(self.x) + ',' + str(self.y) + ',' + str(self.w) + ',' + str(self.h)
+        print(str(self.x) + ',' + str(self.y) + ',' + str(self.w) + ',' + str(self.h))
 
 
-# endclass
-
-class dragRect:
+class DragRectangle:
     # Limits on the canvas
     keepWithin = Rect()
     # To store rectangle
@@ -75,135 +73,103 @@ class dragRect:
     BR = False
     hold = False
 
+    def __init__(self, Img, windowName, windowWidth, windowHeight):
+        # Image
+        self.image = Img
 
-# endclass
+        # Window name
+        self.wname = windowName
 
-def init(dragObj, Img, windowName, windowWidth, windowHeight):
-    # Image
-    dragObj.image = Img
+        # Limit the selection box to the canvas
+        self.keepWithin.x = 0
+        self.keepWithin.y = 0
+        self.keepWithin.w = windowWidth
+        self.keepWithin.h = windowHeight
 
-    # Window name
-    dragObj.wname = windowName
+        # Set rect to zero width and height
+        self.outRect.x = 0
+        self.outRect.y = 0
+        self.outRect.w = 0
+        self.outRect.h = 0
 
-    # Limit the selection box to the canvas
-    dragObj.keepWithin.x = 0
-    dragObj.keepWithin.y = 0
-    dragObj.keepWithin.w = windowWidth
-    dragObj.keepWithin.h = windowHeight
-
-    # Set rect to zero width and height
-    dragObj.outRect.x = 0
-    dragObj.outRect.y = 0
-    dragObj.outRect.w = 0
-    dragObj.outRect.h = 0
-
-
-# enddef
 
 def dragrect(event, x, y, flags, dragObj):
     if x < dragObj.keepWithin.x:
         x = dragObj.keepWithin.x
-    # endif
     if y < dragObj.keepWithin.y:
         y = dragObj.keepWithin.y
-    # endif
     if x > (dragObj.keepWithin.x + dragObj.keepWithin.w - 1):
         x = dragObj.keepWithin.x + dragObj.keepWithin.w - 1
-    # endif
     if y > (dragObj.keepWithin.y + dragObj.keepWithin.h - 1):
         y = dragObj.keepWithin.y + dragObj.keepWithin.h - 1
-    # endif
 
     if event == cv2.EVENT_LBUTTONDOWN:
         mouseDown(x, y, dragObj)
-    # endif
     if event == cv2.EVENT_LBUTTONUP:
-        mouseUp(x, y, dragObj)
-    # endif
+        mouseUp(dragObj)
     if event == cv2.EVENT_MOUSEMOVE:
         mouseMove(x, y, dragObj)
-    # endif
     if event == cv2.EVENT_LBUTTONDBLCLK:
         mouseDoubleClick(x, y, dragObj)
-    # endif
 
-# enddef
 
 def pointInRect(pX, pY, rX, rY, rW, rH):
     if rX <= pX <= (rX + rW) and rY <= pY <= (rY + rH):
         return True
     else:
         return False
-    # endelseif
 
-
-# enddef
 
 def mouseDoubleClick(eX, eY, dragObj):
     if dragObj.active:
-
         if pointInRect(eX, eY, dragObj.outRect.x, dragObj.outRect.y, dragObj.outRect.w, dragObj.outRect.h):
             dragObj.returnflag = True
             cv2.destroyWindow(dragObj.wname)
-        # endif
 
-    # endif
-
-
-# enddef
 
 def mouseDown(eX, eY, dragObj):
     if dragObj.active:
-
         if pointInRect(eX, eY, dragObj.outRect.x - dragObj.sBlk,
                        dragObj.outRect.y - dragObj.sBlk,
                        dragObj.sBlk * 2, dragObj.sBlk * 2):
             dragObj.TL = True
             return
-        # endif
         if pointInRect(eX, eY, dragObj.outRect.x + dragObj.outRect.w - dragObj.sBlk,
                        dragObj.outRect.y - dragObj.sBlk,
                        dragObj.sBlk * 2, dragObj.sBlk * 2):
             dragObj.TR = True
             return
-        # endif
         if pointInRect(eX, eY, dragObj.outRect.x - dragObj.sBlk,
                        dragObj.outRect.y + dragObj.outRect.h - dragObj.sBlk,
                        dragObj.sBlk * 2, dragObj.sBlk * 2):
             dragObj.BL = True
             return
-        # endif
         if pointInRect(eX, eY, dragObj.outRect.x + dragObj.outRect.w - dragObj.sBlk,
                        dragObj.outRect.y + dragObj.outRect.h - dragObj.sBlk,
                        dragObj.sBlk * 2, dragObj.sBlk * 2):
             dragObj.BR = True
             return
-        # endif
 
         if pointInRect(eX, eY, dragObj.outRect.x + dragObj.outRect.w / 2 - dragObj.sBlk,
                        dragObj.outRect.y - dragObj.sBlk,
                        dragObj.sBlk * 2, dragObj.sBlk * 2):
             dragObj.TM = True
             return
-        # endif
         if pointInRect(eX, eY, dragObj.outRect.x + dragObj.outRect.w / 2 - dragObj.sBlk,
                        dragObj.outRect.y + dragObj.outRect.h - dragObj.sBlk,
                        dragObj.sBlk * 2, dragObj.sBlk * 2):
             dragObj.BM = True
             return
-        # endif
         if pointInRect(eX, eY, dragObj.outRect.x - dragObj.sBlk,
                        dragObj.outRect.y + dragObj.outRect.h / 2 - dragObj.sBlk,
                        dragObj.sBlk * 2, dragObj.sBlk * 2):
             dragObj.LM = True
             return
-        # endif
         if pointInRect(eX, eY, dragObj.outRect.x + dragObj.outRect.w - dragObj.sBlk,
                        dragObj.outRect.y + dragObj.outRect.h / 2 - dragObj.sBlk,
                        dragObj.sBlk * 2, dragObj.sBlk * 2):
             dragObj.RM = True
             return
-        # endif
 
         # This has to be below all of the other conditions
         if pointInRect(eX, eY, dragObj.outRect.x, dragObj.outRect.y, dragObj.outRect.w, dragObj.outRect.h):
@@ -214,7 +180,6 @@ def mouseDown(eX, eY, dragObj):
             dragObj.hold = True
 
             return
-        # endif
 
     else:
         dragObj.outRect.x = eX
@@ -223,10 +188,6 @@ def mouseDown(eX, eY, dragObj):
         dragObj.active = True
         return
 
-    # endelseif
-
-
-# enddef
 
 def mouseMove(eX, eY, dragObj):
     if dragObj.drag & dragObj.active:
@@ -234,7 +195,6 @@ def mouseMove(eX, eY, dragObj):
         dragObj.outRect.h = eY - dragObj.outRect.y
         clearCanvasNDraw(dragObj)
         return
-    # endif
 
     if dragObj.hold:
         dragObj.outRect.x = eX - dragObj.anchor.x
@@ -242,20 +202,15 @@ def mouseMove(eX, eY, dragObj):
 
         if dragObj.outRect.x < dragObj.keepWithin.x:
             dragObj.outRect.x = dragObj.keepWithin.x
-        # endif
         if dragObj.outRect.y < dragObj.keepWithin.y:
             dragObj.outRect.y = dragObj.keepWithin.y
-        # endif
         if (dragObj.outRect.x + dragObj.outRect.w) > (dragObj.keepWithin.x + dragObj.keepWithin.w - 1):
             dragObj.outRect.x = dragObj.keepWithin.x + dragObj.keepWithin.w - 1 - dragObj.outRect.w
-        # endif
         if (dragObj.outRect.y + dragObj.outRect.h) > (dragObj.keepWithin.y + dragObj.keepWithin.h - 1):
             dragObj.outRect.y = dragObj.keepWithin.y + dragObj.keepWithin.h - 1 - dragObj.outRect.h
-        # endif
 
         clearCanvasNDraw(dragObj)
         return
-    # endif
 
     if dragObj.TL:
         dragObj.outRect.w = (dragObj.outRect.x + dragObj.outRect.w) - eX
@@ -264,66 +219,53 @@ def mouseMove(eX, eY, dragObj):
         dragObj.outRect.y = eY
         clearCanvasNDraw(dragObj)
         return
-    # endif
     if dragObj.BR:
         dragObj.outRect.w = eX - dragObj.outRect.x
         dragObj.outRect.h = eY - dragObj.outRect.y
         clearCanvasNDraw(dragObj)
         return
-    # endif
     if dragObj.TR:
         dragObj.outRect.h = (dragObj.outRect.y + dragObj.outRect.h) - eY
         dragObj.outRect.y = eY
         dragObj.outRect.w = eX - dragObj.outRect.x
         clearCanvasNDraw(dragObj)
         return
-    # endif
     if dragObj.BL:
         dragObj.outRect.w = (dragObj.outRect.x + dragObj.outRect.w) - eX
         dragObj.outRect.x = eX
         dragObj.outRect.h = eY - dragObj.outRect.y
         clearCanvasNDraw(dragObj)
         return
-    # endif
 
     if dragObj.TM:
         dragObj.outRect.h = (dragObj.outRect.y + dragObj.outRect.h) - eY
         dragObj.outRect.y = eY
         clearCanvasNDraw(dragObj)
         return
-    # endif
     if dragObj.BM:
         dragObj.outRect.h = eY - dragObj.outRect.y
         clearCanvasNDraw(dragObj)
         return
-    # endif
     if dragObj.LM:
         dragObj.outRect.w = (dragObj.outRect.x + dragObj.outRect.w) - eX
         dragObj.outRect.x = eX
         clearCanvasNDraw(dragObj)
         return
-    # endif
     if dragObj.RM:
         dragObj.outRect.w = eX - dragObj.outRect.x
         clearCanvasNDraw(dragObj)
         return
-    # endif
 
 
-# enddef
-
-def mouseUp(eX, eY, dragObj):
+def mouseUp(dragObj):
     dragObj.drag = False
     disableResizeButtons(dragObj)
     straightenUpRect(dragObj)
     if dragObj.outRect.w == 0 or dragObj.outRect.h == 0:
         dragObj.active = False
-    # endif
 
     clearCanvasNDraw(dragObj)
 
-
-# enddef
 
 def disableResizeButtons(dragObj):
     dragObj.TL = dragObj.TM = dragObj.TR = False
@@ -332,20 +274,17 @@ def disableResizeButtons(dragObj):
     dragObj.hold = False
 
 
-# enddef
-
 def straightenUpRect(dragObj):
+    """
+    Make sure x, y, w, h of the Rect are positive
+    """
     if dragObj.outRect.w < 0:
         dragObj.outRect.x = dragObj.outRect.x + dragObj.outRect.w
         dragObj.outRect.w = -dragObj.outRect.w
-    # endif
     if dragObj.outRect.h < 0:
         dragObj.outRect.y = dragObj.outRect.y + dragObj.outRect.h
         dragObj.outRect.h = -dragObj.outRect.h
-    # endif
 
-
-# enddef
 
 def clearCanvasNDraw(dragObj):
     # Draw
@@ -358,9 +297,10 @@ def clearCanvasNDraw(dragObj):
     cv2.waitKey()
 
 
-# enddef
-
 def drawSelectMarkers(image, dragObj):
+    """
+    Draw markers on the dragged rectangle
+    """
     # Top-Left
     cv2.rectangle(image, (dragObj.outRect.x - dragObj.sBlk,
                           dragObj.outRect.y - dragObj.sBlk),
@@ -387,28 +327,26 @@ def drawSelectMarkers(image, dragObj):
                   (0, 255, 0), 2)
 
     # Top-Mid
-    cv2.rectangle(image, (dragObj.outRect.x + dragObj.outRect.w / 2 - dragObj.sBlk,
+    cv2.rectangle(image, (dragObj.outRect.x + int(dragObj.outRect.w / 2) - dragObj.sBlk,
                           dragObj.outRect.y - dragObj.sBlk),
-                  (dragObj.outRect.x + dragObj.outRect.w / 2 - dragObj.sBlk + dragObj.sBlk * 2,
+                  (dragObj.outRect.x + int(dragObj.outRect.w / 2) - dragObj.sBlk + dragObj.sBlk * 2,
                    dragObj.outRect.y - dragObj.sBlk + dragObj.sBlk * 2),
                   (0, 255, 0), 2)
     # Bottom-Mid
-    cv2.rectangle(image, (dragObj.outRect.x + dragObj.outRect.w / 2 - dragObj.sBlk,
+    cv2.rectangle(image, (dragObj.outRect.x + int(dragObj.outRect.w / 2) - dragObj.sBlk,
                           dragObj.outRect.y + dragObj.outRect.h - dragObj.sBlk),
-                  (dragObj.outRect.x + dragObj.outRect.w / 2 - dragObj.sBlk + dragObj.sBlk * 2,
+                  (dragObj.outRect.x + int(dragObj.outRect.w / 2) - dragObj.sBlk + dragObj.sBlk * 2,
                    dragObj.outRect.y + dragObj.outRect.h - dragObj.sBlk + dragObj.sBlk * 2),
                   (0, 255, 0), 2)
     # Left-Mid
     cv2.rectangle(image, (dragObj.outRect.x - dragObj.sBlk,
-                          dragObj.outRect.y + dragObj.outRect.h / 2 - dragObj.sBlk),
+                          dragObj.outRect.y + int(dragObj.outRect.h / 2) - dragObj.sBlk),
                   (dragObj.outRect.x - dragObj.sBlk + dragObj.sBlk * 2,
-                   dragObj.outRect.y + dragObj.outRect.h / 2 - dragObj.sBlk + dragObj.sBlk * 2),
+                   dragObj.outRect.y + int(dragObj.outRect.h / 2) - dragObj.sBlk + dragObj.sBlk * 2),
                   (0, 255, 0), 2)
     # Right-Mid
     cv2.rectangle(image, (dragObj.outRect.x + dragObj.outRect.w - dragObj.sBlk,
-                          dragObj.outRect.y + dragObj.outRect.h / 2 - dragObj.sBlk),
+                          dragObj.outRect.y + int(dragObj.outRect.h / 2) - dragObj.sBlk),
                   (dragObj.outRect.x + dragObj.outRect.w - dragObj.sBlk + dragObj.sBlk * 2,
-                   dragObj.outRect.y + dragObj.outRect.h / 2 - dragObj.sBlk + dragObj.sBlk * 2),
+                   dragObj.outRect.y + int(dragObj.outRect.h / 2) - dragObj.sBlk + dragObj.sBlk * 2),
                   (0, 255, 0), 2)
-
-# enddef
