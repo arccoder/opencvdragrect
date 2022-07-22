@@ -75,7 +75,8 @@ class DragRectangle:
 
     def __init__(self, Img, windowName, windowWidth, windowHeight):
         # Image
-        self.image = Img
+        self.original = Img
+        self.image = self.original.copy()
 
         # Window name
         self.wname = windowName
@@ -124,7 +125,6 @@ def mouseDoubleClick(eX, eY, dragObj):
     if dragObj.active:
         if pointInRect(eX, eY, dragObj.outRect.x, dragObj.outRect.y, dragObj.outRect.w, dragObj.outRect.h):
             dragObj.returnflag = True
-            cv2.destroyWindow(dragObj.wname)
 
 
 def mouseDown(eX, eY, dragObj):
@@ -288,13 +288,12 @@ def straightenUpRect(dragObj):
 
 def clearCanvasNDraw(dragObj):
     # Draw
-    tmp = dragObj.image.copy()
+    tmp = dragObj.original.copy()
     cv2.rectangle(tmp, (dragObj.outRect.x, dragObj.outRect.y),
                   (dragObj.outRect.x + dragObj.outRect.w,
                    dragObj.outRect.y + dragObj.outRect.h), (0, 255, 0), 2)
     drawSelectMarkers(tmp, dragObj)
-    cv2.imshow(dragObj.wname, tmp)
-    cv2.waitKey()
+    dragObj.image = tmp
 
 
 def drawSelectMarkers(image, dragObj):
